@@ -10,38 +10,52 @@
   const ctx = c.getContext('2d');
   const start_time = Date.now();
 
-  const TAU = Math.PI * 2, sin = Math.sin, cos = Math.cos;
-  function circle(ctx, {x, y}, r) { 
-    ctx.moveTo(x + r, y); 
-    ctx.arc(x, y, r, 0, TAU); 
-  }
-  function draw_path(ctx, path) {
-    const scr_path = path.map(scr);
-    
-  }
-  function segment(i, N, r0, r1) {
-        
-  }
-  
   const scr = ({x, y}) => ({x: (0.5 * x + 0.5) * W, y: (0.5 * y + 0.5) * H});
+  const TAU = Math.PI * 2, sin = Math.sin, cos = Math.cos;
   const R = (f, p, a, s) => ({
     x: a * cos(TAU * (f * s + p)), 
     y: a * sin(TAU * (f * s + p))
   });
+  function circle(ctx, {x, y}, r) { 
+    ctx.moveTo(x + r, y); 
+    ctx.arc(x, y, r, 0, TAU); 
+  }
+  function draw_path(ctx, path, closed=false) {
+    const sp = path.map(scr);
+    ctx.moveTo(sp[0].x, sp[0].y);
+    for (let i = 1; i < sp.length; i++) {
+      ctx.lineTo(sp[i].x, sp[i].y);
+    }
+    if (closed) ctx.closePath();
+  }
+  function segment(i, N, r0, r1, p=0) {
+    const t0 = i / N, t1 = (i + 1) / N;
+    draw_path(ctx, [
+      R(1, p, r0, t0),
+      R(1, p, r1, t0),
+      R(1, p, r1, t1),
+      R(1, p, r0, t1),
+    ], true);
+  }  
   
   function draw() {
     const millis = Date.now() - start_time;
     const secs = millis / 1000;
-    ctx.fillStyle = '#00f';
+    ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, W, H);
     const N = 12;
     for (let i = 0; i < N; i++) {
-      const t = i / N;
-      const p = R(1, secs * 0.1, 0.7, t);
-      ctx.fillStyle = '#f00';
+      ctx.fillStyle = ['#06f', '#f60'][i&1];
       ctx.beginPath();
-      circle(ctx, scr(p), 32);
+      segment(i, N, 0.6, 0.8, secs * 0.1);
       ctx.fill();
+      // ctx.fillStyle = '#f00';
+      // const t = i / N;
+      // const p = R(1, secs * 0.1, 0.7, t);
+      // ctx.beginPath();
+      // circle(ctx, scr(p), 0.1 * W * 0.5);
+      // ctx.fill();
+      
     }
     requestAnimationFrame(draw);
   }
