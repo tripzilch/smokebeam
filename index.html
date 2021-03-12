@@ -9,24 +9,31 @@
   const W = c.width = 2000, H = c.height = 2000;
   const ctx = c.getContext('2d');
   const start_time = Date.now();
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, W, H);
+
+  const TAU = Math.PI * 2, sin = Math.sin, cos = Math.cos;
+  function circle(ctx, {x, y}, r) { 
+    ctx.moveTo(x + r, y); 
+    ctx.arc(x, y, r, 0, TAU); 
+  }
   
-  const pal = ['#61a', '#fd0', '#36e', '#478'];
-  let p = {x: 0.2, y: 0.3};
-  let col = pal[0], alpha = '4';
+  const scr = ({x, y}) => ({x: (0.5 * x + 0.5) * W, y: (0.5 * y + 0.5) * H});
+  const R = (f, p, a, s) => ({
+    x: a * cos(TAU * (f * s + p)), 
+    y: a * sin(TAU * (f * s + p))
+  });
+  
   function draw() {
     const millis = Date.now() - start_time;
-    for (let i = 0; i < 999; i++) {
-      const n = Math.random() * NF|0;
-      p = ff[n](p);
-      if (Math.random() < 0.4) col = pal[n];      
-      ctx.fillStyle = col + alpha;
-      ctx.fillRect((0.5 * p.x + 0.5) * W, (0.5 * p.y + 0.5) * H, 1, 1);
-      const sx = p.x + 0.025 * (Math.random() * Math.random()) ** 2;
-      const sy = p.y + 0.05 * (Math.random() * Math.random()) ** 2;
-      ctx.fillStyle = '#000' + alpha;
-      ctx.fillRect((0.5 * sx + 0.5) * W, (0.5 * sy + 0.5) * H, 1, 1);
+    const secs = millis / 1000;
+    ctx.fillStyle = '#00f';
+    ctx.fillRect(0, 0, W, H);
+    const N = 12;
+    for (let i = 0; i < N; i++) {
+      const t = i / N;
+      const p = R(1, secs, 0.7, t);
+      ctx.fillStyle = '#f00';
+      circle(ctx, scr(p), 8);
+      ctx.fill();
     }
     requestAnimationFrame(draw);
   }
