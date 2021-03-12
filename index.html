@@ -15,6 +15,13 @@
     ctx.moveTo(x + r, y); 
     ctx.arc(x, y, r, 0, TAU); 
   }
+  function draw_path(ctx, path) {
+    const scr_path = path.map(scr);
+    
+  }
+  function segment(i, N, r0, r1) {
+        
+  }
   
   const scr = ({x, y}) => ({x: (0.5 * x + 0.5) * W, y: (0.5 * y + 0.5) * H});
   const R = (f, p, a, s) => ({
@@ -30,9 +37,10 @@
     const N = 12;
     for (let i = 0; i < N; i++) {
       const t = i / N;
-      const p = R(1, secs, 0.7, t);
+      const p = R(1, secs * 0.1, 0.7, t);
       ctx.fillStyle = '#f00';
-      circle(ctx, scr(p), 8);
+      ctx.beginPath();
+      circle(ctx, scr(p), 32);
       ctx.fill();
     }
     requestAnimationFrame(draw);
